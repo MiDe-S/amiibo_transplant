@@ -1,32 +1,7 @@
 import PySimpleGUI as sg
 from amiibo_functions import *
+from character_dictionary import CharacterDictionary
 import os
-
-
-def create_character_dict(directory):
-    """
-    Reads characters and hexnums from characters.txt for character menu
-    :param directory: file location of characters.txt
-    :return: Dictionary of character: hexnum
-    """
-    char_dict = {}
-    directory = r'/'.join([directory, "Brain_Transplant_Assets"])
-    try:
-        with open(r'/'.join([directory, 'characters.txt']), 'r') as char_list:
-            for line in char_list:
-                if line[0] == '@':
-                    continue
-                else:
-                    line = line.split(',')
-                    # removes line break character
-                    if len(line[1]) > 16:
-                        line[1] = line[1][:-1]
-                    char_dict[line[0]] = line[1]
-        print("Characters loaded in successfully.\n")
-    except:
-        input("Something went wrong with characters.txt, please read the README.txt, enter any button to close.")
-        exit()
-    return char_dict
 
 
 def main():
@@ -41,11 +16,12 @@ def main():
     randomize_sn_key = '_randomize-sn_'
     folder_location_key = '_selected-folder_'
     browsed_key = '_browse-submission_'
+    pwd_key = '_current-directory_'
 
     # gets current key_directory
     directory = os.path.dirname(os.path.realpath(__file__))
 
-    char_dict = create_character_dict(directory)
+    char_dict = CharacterDictionary()
 
     transplanter = BinManager(char_dict)
 
@@ -55,10 +31,9 @@ def main():
             if bin_file != 'unfixed-info.bin' and bin_file != 'locked-secret.bin':
                 found_bins.append(bin_file[:-4])
 
-    characters = list(char_dict.keys())
-    characters.insert(0, "Random")
+    characters = char_dict.get_list(insert_random=True)
 
-    transplant_layout = [[sg.FolderBrowse(target=browsed_key, key=folder_location_key, enable_events=True), sg.Text("Currently looking at:"), sg.Text(directory, key="test", auto_size_text=True)],
+    transplant_layout = [[sg.FolderBrowse(target=browsed_key, key=folder_location_key, enable_events=True), sg.Text("Currently looking at:"), sg.Text(directory, key=pwd_key, auto_size_text=True)],
               [sg.Input(key=submitted_key, enable_events=True, visible=False), sg.Input(key=browsed_key, enable_events=True, visible=False)],
               [sg.Listbox(found_bins, sg.LISTBOX_SELECT_MODE_SINGLE, size=(40, 10), key=bin_name_key), sg.VerticalSeparator(),
                sg.Listbox(characters, sg.LISTBOX_SELECT_MODE_SINGLE, size=(30, 10), key=character_key)],
@@ -71,7 +46,7 @@ def main():
     character_editor_layout = [[sg.Text("who knows")]]
 
     about_layout = [[sg.Text("Version Number {}".format(version_number))],
-                    [sg.Text("If you encounter issues raise a issue on github or dm MiDe#9934 on discord")],
+                    [sg.Text("If you encounter issues raise an issue on github or dm MiDe#9934 on discord")],
                     [sg.Text("Shoutouts to the amiibo homies at USAC: https://discord.gg/2SEqk9p", tooltip="I'm too lazy to make this an actual link for now")]]
 
     tabs = [[sg.TabGroup([[sg.Tab("Transplant", transplant_layout),
@@ -109,8 +84,8 @@ def main():
                     if bin_file != 'unfixed-info.bin' and bin_file != 'locked-secret.bin':
                         new_found_bins.append(bin_file[:-4])
             window[bin_name_key].update(new_found_bins)
-            #window["test"].set_size((len(new_directory), 1))
-            window["test"].update(new_directory)
+            #window[pwd_key].set_size((len(new_directory), 1))
+            window[pwd_key].update(new_directory)
             window.refresh()
 
         if event == sg.WIN_CLOSED:
