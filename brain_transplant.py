@@ -1,7 +1,6 @@
-from amiibo import AmiiboDump, AmiiboMasterKey
-from functions_brain_transplant import *
+from amiibo_functions import *
+from transplant_functions import *
 import os
-import random
 
 def main():
     #gets current directory
