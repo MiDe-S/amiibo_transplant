@@ -1,6 +1,5 @@
 from amiibo import AmiiboDump, AmiiboMasterKey
 import random
-import os
 
 
 class BinManager:
@@ -61,14 +60,15 @@ class BinManager:
             dump.uid_hex = serial_number
             dump.lock()
 
-    def transplant(self, bin, character, key_directory="Brain_Transplant_Assets"):
+    def transplant(self, bin, character, saveAs_location, key_directory="Brain_Transplant_Assets", randomize_SN=False):
         """
         Takes a bin and replaces it's character ID with given character's ID
 
         :param bin: file location of bin to use
         :param character: Character from char_dict you want to transplant into
         :param key_directory: file location of Brain_Transplant_Assets Folder
-        :return: None
+        :param randomize_SN: If the bin SN should be randomized or not
+        :return: Character it was transplanted into
         """
 
         with open(r'\\'.join([key_directory, 'unfixed-info.bin']), 'rb') as fp_d, \
@@ -78,6 +78,9 @@ class BinManager:
 
         with open('.'.join([bin, 'bin']), 'rb') as fp:
             dump = AmiiboDump(master_keys, fp.read())
+
+        if randomize_SN:
+            self.randomize_sn(dump)
 
         if character == "Random":
             same_check = True
@@ -112,9 +115,8 @@ class BinManager:
                 exit()
             dump.data[84:92] = bytes.fromhex(hex_tag)
             dump.lock()
-            print("{} is now a {} amiibo".format(bin, rng_character))
-            new_bin_name = bin
-            with open('.'.join([new_bin_name, "bin"]), 'wb') as fp:
+            character = rng_character
+            with open(saveAs_location, 'wb') as fp:
                 fp.write(dump.data)
 
         elif character != "All":
@@ -136,10 +138,8 @@ class BinManager:
                 input("Mii fighters are currently not usable with this program, press any button to exit")
                 exit()
             dump.data[84:92] = bytes.fromhex(hex_tag)
-            self.randomize_sn(dump)
             dump.lock()
-            new_bin_name = "{} into a {}".format(bin, character)
-            with open('.'.join([new_bin_name, "bin"]), 'wb') as fp:
+            with open(saveAs_location, 'wb') as fp:
                 fp.write(dump.data)
 
         else:
@@ -174,5 +174,6 @@ class BinManager:
                 dump.lock()
                 with open(r'/'.join([key_directory, '.'.join([char, "bin"])]), 'wb') as fp:
                     fp.write(dump.data)
+        return character
 
 
