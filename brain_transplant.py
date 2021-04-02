@@ -16,6 +16,8 @@ def main():
 
     char_dict = create_character_dict(directory)
 
+    Transplanter = BinManager(char_dict)
+
     # central loop for detecting bins, picking new character, and saving
     do_again = 'y'
     while do_again.lower() == 'y':
@@ -41,11 +43,11 @@ def main():
                 for bin_file in os.listdir(directory):
                     if bin_file[-3:] == "bin":
                         if bin_file != 'unfixed-info.bin' and bin_file != 'locked-secret.bin':
-                            transplant(bin_file[:-4], character, char_dict)
+                            Transplanter.transplant(bin_file[:-4], character)
             elif selected_bin in found_bins:
                 name_error = False
                 character = character_selector(char_dict)
-                transplant(selected_bin, character, char_dict)
+                Transplanter.transplant(selected_bin, character)
             else:
                 print("ERROR: Name not found, please try again")
         print('-' * 50)
