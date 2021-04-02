@@ -52,7 +52,10 @@ class CharacterDictionary:
         :param insert_random: If true, random is inserted at the end
         :return: list of characters in the dictionary
         """
-        output = list(self.dict.keys())
+        output = []
+        for key in self.dict:
+            if self.dict[key][1] == "True":
+                output.append(key)
         if insert_random:
             output.append("Random")
         return output
@@ -112,3 +115,14 @@ class CharacterDictionary:
 
         with open(self.directory, "wb") as files:
             tree.write(files)
+
+    def print_contents(self):
+        """
+        Returns the contents of the dictionary
+
+        :return: Gives the contents of the dictionary as a list of strings
+        """
+        output = []
+        for key in self.dict:
+            output.append("{}, {}, enabled={}".format(key, self.dict[key][0], self.dict[key][1]))
+        return output
