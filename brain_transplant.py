@@ -15,7 +15,8 @@ folder_location_key = '_selected-folder_'
 browsed_key = '_browse-submission_'
 pwd_key = '_current-directory_'
 # Serial Swapper Tab
-
+browse1_key = '_browse1_'
+browse2_key = '_browse2_'
 # Character.xml Modify Tab
 add_character_key = '_add-character_'
 character_edit_box_key = '_character-edit-box_'
@@ -66,12 +67,19 @@ def main():
               [sg.Text(key=success_text_key, size=(10, 1), visible=False)]]
 
     # serial swap tab
-    serial_swapper_layout = [[sg.Text("Lasaga wins amiibo")]]
+    serial_swapper_layout = [[sg.Input(key=browse1_key, enable_events=True, visible=False), sg.Input(key=browse2_key, enable_events=True, visible=False)],
+                             [sg.FolderBrowse("Donor", target=browse1_key, enable_events=True),
+                              sg.Text(directory, auto_size_text=True),
+                              sg.FolderBrowse("Receiver", target=browse2_key, enable_events=True),
+                              sg.Text(directory, auto_size_text=True)],
+              [sg.Listbox(located_bins, sg.LISTBOX_SELECT_MODE_SINGLE, size=(40, 10)), sg.VerticalSeparator(), sg.Listbox(located_bins, sg.LISTBOX_SELECT_MODE_SINGLE, size=(40, 10))],
+              [sg.FileSaveAs("Swap Serial Numbers", file_types=(('Bin Files', '*.bin'),), default_extension=".bin", initial_folder=directory)],
+              [sg.Text(size=(10, 1), visible=False)]]
 
     # character list tab
     dict_contents = char_dict.print_contents()
-    character_list_editor_layout = [[sg.Listbox(dict_contents, sg.LISTBOX_SELECT_MODE_SINGLE, size=(50, 15), key=character_edit_box_key)],
-         [sg.Button("Add", key=add_character_key), sg.Button("Delete", key=delete_character_key), sg.Button("Enable/Disable", key=change_enable_key)]]
+    character_list_editor_layout = [[sg.Listbox(dict_contents, sg.LISTBOX_SELECT_MODE_SINGLE, size=(50, 15), key=character_edit_box_key, pad=(5, 5))],
+         [sg.Button("Add", key=add_character_key), sg.Button("Enable/Disable", key=change_enable_key), sg.Button("Delete", key=delete_character_key)]]
 
     # about tab
     about_layout = [[sg.Text("Version Number {}".format(version_number))],
@@ -85,8 +93,8 @@ def main():
 
     window = sg.Window('MiDes Brain Transplant Service'.format(version_number), tabs)
 
-    w = True
-    while w:
+
+    while True:
         event, values = window.read()
         print(event, values)
         # Transplant Tab
@@ -146,6 +154,7 @@ def main():
                 elif event == sg.WIN_CLOSED or event == add_cancel_key or event == "Quit":
                     break
             add_window.close()
+        # Remove / enable or disable character
         elif event == delete_character_key or event == change_enable_key:
             if len(values[character_edit_box_key]) == 0:
                 no_selection_error("Please select a character to delete.")
@@ -158,8 +167,6 @@ def main():
                     char_dict.enable(character)
                 char_dict.save_XML()
                 update_all_listboxes(window, char_dict, directory)
-
-
 
         # Window Closed
         elif event == sg.WIN_CLOSED:
