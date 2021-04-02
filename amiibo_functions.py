@@ -21,19 +21,18 @@ def hex_list_to_string(values):
     return output[:-1]
 
 
-def transplant(bin, character, char_dict, directory):
+def transplant(bin, character, char_dict, key_directory="Brain_Transplant_Assets"):
     """
     Takes a bin and replaces it's character ID with given character's ID
 
     :param bin: file location of bin to use
     :param character: Character from char_dict you want to transplant into
     :param char_dict: character dictionary from create_character_dictionary
-    :param directory: file location of Brain_Transplant_Assets Folder
+    :param key_directory: file location of Brain_Transplant_Assets Folder
     :return: None
     """
-    directory = r'/'.join([directory, "Brain_Transplant_Assests"])
-    with open(r'/'.join([directory, 'unfixed-info.bin']), 'rb') as fp_d, \
-            open(r'/'.join([directory, 'locked-secret.bin']), 'rb') as fp_t:
+    with open(r'\\'.join([key_directory, 'unfixed-info.bin']), 'rb') as fp_d, \
+            open(r'\\'.join([key_directory, 'locked-secret.bin']), 'rb') as fp_t:
         master_keys = AmiiboMasterKey.from_separate_bin(
             fp_d.read(), fp_t.read())
 
@@ -107,7 +106,7 @@ def transplant(bin, character, char_dict, directory):
     else:
         warning = input('''WARNING, FOR THIS SERIAL NUMBERS ARE CHANGED, NOT RANDOMIZED, DO NOT SEND THESE TO TOURNEYS
         Also this will create a lot of bins, I hope you know what you are doing
-        Also Also all bins for this are saved in Brain_Transplant_Assests
+        Also Also all bins for this are saved in Brain_Transplant_Assets
         Are you sure you want to continue? (y/n) ''')
         if warning.lower() != 'y':
             input("The program will now close.")
@@ -134,7 +133,7 @@ def transplant(bin, character, char_dict, directory):
             serial_number_tail += 1
             dump.uid_hex = serial_number
             dump.lock()
-            with open(r'/'.join([directory, '.'.join([char, "bin"])]), 'wb') as fp:
+            with open(r'/'.join([key_directory, '.'.join([char, "bin"])]), 'wb') as fp:
                 fp.write(dump.data)
 
 
@@ -147,12 +146,12 @@ def bin_value_getter():
     """
 
     # Opening Key Files
-    with open(r'Brain_Transplant_Assests\unfixed-info.bin', 'rb') as fp_d, \
-            open(r'Brain_Transplant_Assests\locked-secret.bin', 'rb') as fp_t:
+    with open(r'Brain_Transplant_Assets\unfixed-info.bin', 'rb') as fp_d, \
+            open(r'Brain_Transplant_Assets\locked-secret.bin', 'rb') as fp_t:
         master_keys = AmiiboMasterKey.from_separate_bin(
             fp_d.read(), fp_t.read())
 
-    # gets current directory
+    # gets current key_directory
     directory = os.path.dirname(os.path.realpath(__file__))
     bin_values = []
     for bin_file in os.listdir(directory):
@@ -196,8 +195,8 @@ def construct_bin(base_bin_location, character, values, char_dict):
     """
 
     # Opening Key Files
-    with open(r'Brain_Transplant_Assests\unfixed-info.bin', 'rb') as fp_d, \
-            open(r'Brain_Transplant_Assests\locked-secret.bin', 'rb') as fp_t:
+    with open(r'Brain_Transplant_Assets\unfixed-info.bin', 'rb') as fp_d, \
+            open(r'Brain_Transplant_Assets\locked-secret.bin', 'rb') as fp_t:
         master_keys = AmiiboMasterKey.from_separate_bin(
             fp_d.read(), fp_t.read())
     with open(base_bin_location, 'rb') as fp:

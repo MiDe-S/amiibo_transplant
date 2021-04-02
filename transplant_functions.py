@@ -10,7 +10,7 @@ def create_character_dict(directory):
     :return: Dictionary of character: hexnum
     """
     char_dict = {}
-    directory = r'/'.join([directory, "Brain_Transplant_Assests"])
+    directory = r'/'.join([directory, "Brain_Transplant_Assets"])
     try:
         with open(r'/'.join([directory, 'characters.txt']), 'r') as char_list:
             for line in char_list:
@@ -55,7 +55,7 @@ def ask_for_bin_name(insert_all=True):
     :param insert_all: bool containing if "All" should be an option
     :return: string of selected file name
     """
-    # gets current directory
+    # gets current key_directory
     directory = os.path.dirname(os.path.realpath(__file__))
     found_bins = []
     for bin_file in os.listdir(directory):

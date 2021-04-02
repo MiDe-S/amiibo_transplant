@@ -3,12 +3,12 @@ from transplant_functions import *
 import os
 
 def main():
-    #gets current directory
+    #gets current key_directory
     directory = os.path.dirname(os.path.realpath(__file__))
 
     print('''---------------------------------------------------------------------------------
     | Welcome to release 1.0.2 of MiDe's Brain Transplant Service,                  |
-    | Make sure to check out the README.txt in the Brain_Transplant_Assests folder! |
+    | Make sure to check out the README.txt in the Brain_Transplant_Assets folder! |
     |                                                                               |
     | Using Mii Fighters with this program will not work. PLEASE DON'T USE THEM!!!  |
     ---------------------------------------------------------------------------------
@@ -41,11 +41,11 @@ def main():
                 for bin_file in os.listdir(directory):
                     if bin_file[-3:] == "bin":
                         if bin_file != 'unfixed-info.bin' and bin_file != 'locked-secret.bin':
-                            transplant(bin_file[:-4], character, char_dict, directory)
+                            transplant(bin_file[:-4], character, char_dict)
             elif selected_bin in found_bins:
                 name_error = False
                 character = character_selector(char_dict)
-                transplant(selected_bin, character, char_dict, directory)
+                transplant(selected_bin, character, char_dict)
             else:
                 print("ERROR: Name not found, please try again")
         print('-' * 50)
