@@ -15,6 +15,39 @@ class BinManager:
             self.master_keys = AmiiboMasterKey.from_separate_bin(
                 fp_d.read(), fp_t.read())
 
+    def __open_bin(self, bin_location):
+        """
+        Opens a bin and makes it 540 bytes if it wasn't
+
+        :param bin_location: file location of bin you want to open
+        :return: opened bin
+        """
+        bin_fp = open(bin_location, 'rb')
+
+        bin_dump = bytes()
+        for line in bin_fp:
+            bin_dump += line
+        bin_fp.close()
+
+        if len(bin_dump) == 540:
+            with open(bin_location, 'rb') as fp:
+                dump = AmiiboDump(self.master_keys, fp.read())
+                return dump
+        elif 532 <= len(bin_dump) <= 572:
+            while len(bin_dump) < 540:
+                bin_dump += b'\x00'
+            if len(bin_dump) > 540:
+                bin_dump = bin_dump[:-(len(bin_dump) - 540)]
+            b = open(bin_location, 'wb')
+            b.write(bin_dump)
+            b.close()
+
+            with open(bin_location, 'rb') as fp:
+                dump = AmiiboDump(self.master_keys, fp.read())
+                return dump
+        else:
+            return None
+
     def update_char_dictionary(self, new_char_dict):
         """
         Updates character dictionary
@@ -59,8 +92,10 @@ class BinManager:
         :return: Character it was transplanted into
         """
 
-        with open(bin_location, 'rb') as fp:
-            dump = AmiiboDump(self.master_keys, fp.read())
+        dump = self.__open_bin(bin_location)
+
+        if dump is None:
+            return None
 
         if randomize_SN:
             self.randomize_sn(dump)
@@ -92,13 +127,17 @@ class BinManager:
         :param saveAs_location: location to save new bin
         :return: None
         """
-        with open('.'.join([donor, 'bin']), 'rb') as fp:
-            donor_dump = AmiiboDump(self.master_keys, fp.read())
-        with open('.'.join([receiver, 'bin']), 'rb') as fp:
-            receiver_dump = AmiiboDump(self.master_keys, fp.read())
+        donor_dump = self.__open_bin(donor)
+        receiver_dump = self.__open_bin(receiver)
+
+        if donor_dump is None or receiver_dump is None:
+            return None
+
         receiver_dump.unlock()
         receiver_dump.uid_hex = donor_dump.uid_hex
         receiver_dump.lock()
 
         with open(saveAs_location, 'wb') as fp:
             fp.write(receiver_dump.data)
+
+        return True

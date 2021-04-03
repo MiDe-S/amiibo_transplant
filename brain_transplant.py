@@ -73,6 +73,15 @@ def main():
     # Initialize variables that get used throughout the program
     version_number = "2.0.0"
 
+    if not os.path.exists("Brain_Transplant_Assets/unfixed-info.bin") or not os.path.exists("Brain_Transplant_Assets/locked-secret.bin"):
+        no_selection_error("You are missing the encryption/decryption keys for amiibo.\nThey are named unfixed-info.bin and locked-secret.bin.\nPlease place them in the Brain_Transplant_Assets Folder.")
+        exit()
+    if not os.path.exists("Brain_Transplant_Assets/characters.xml"):
+        no_selection_error("Something is wrong with characters.xml.\nTry deleting and reinstalling the program or just grab character.xml from the github repository.")
+        exit()
+
+    sg.theme("Dark Blue 12")
+
     # gets current key_directory
     directory1 = os.path.dirname(os.path.realpath(__file__))
 
@@ -89,7 +98,7 @@ def main():
               [sg.Input(key=submitted_key, enable_events=True, visible=False), sg.Input(key=browsed_key, enable_events=True, visible=False)],
               [sg.Listbox(located_bins1, sg.LISTBOX_SELECT_MODE_SINGLE, size=(40, 10), key=bin_name_key), sg.VerticalSeparator(),
                sg.Listbox(characters, sg.LISTBOX_SELECT_MODE_SINGLE, size=(30, 10), key=character_key)],
-              [sg.FileSaveAs("Transplant", target=submitted_key, key=save_location_key, file_types=(('Bin Files', '*.bin'),), default_extension=".bin", initial_folder=directory1),
+              [sg.FileSaveAs("Transplant", target=submitted_key, key=save_location_key, file_types=(('Bin Files', '*.bin'),), default_extension=".bin"),
                sg.Checkbox("Randomize Serial Number", key=randomize_sn_key, enable_events=True, default=True)],
               [sg.Text(key=success_text_key, size=(10, 1), visible=False)]]
 
@@ -102,7 +111,7 @@ def main():
                               sg.FolderBrowse("Receiver", key=receiver_browse_key, target=browse2_key, enable_events=True),
                               sg.Text(directory2, key=display_dir2_key, auto_size_text=True)],
               [sg.Listbox(located_bins1, sg.LISTBOX_SELECT_MODE_SINGLE, key=donor_box_key, size=(40, 10)), sg.VerticalSeparator(), sg.Listbox(located_bins2, sg.LISTBOX_SELECT_MODE_SINGLE, key=receiver_box_key, size=(40, 10))],
-              [sg.FileSaveAs("Transplant Serial Number", target=swapper_save_key, key=swap_save_location_key, file_types=(('Bin Files', '*.bin'),), default_extension=".bin", initial_folder=directory1)],
+              [sg.FileSaveAs("Transplant Serial Number", target=swapper_save_key, key=swap_save_location_key, file_types=(('Bin Files', '*.bin'),), default_extension=".bin")],
               [sg.Text(key=success_swap_key, size=(10, 1), visible=False)]]
 
     # character list tab
@@ -138,11 +147,14 @@ def main():
             # If only 1 character and 1 bin were chosen do the single transplant
             elif len(selected_characters) == 1 and len(bins_to_transplant) == 1:
                 chosen_character = transplanter.transplant(r"\\".join([directory1, name_formatter[bins_to_transplant[0]]]), selected_characters[0], values[save_location_key], values[randomize_sn_key])
-                # Prints message showing a successful transplant
-                success_message = "{} bin was saved at {}".format(chosen_character, values[save_location_key])
-                window[success_text_key].update(success_message, visible=True)
-                window[success_text_key].set_size((len(success_message), 1))
-                update_all_listboxes(window, char_dict, directory1, directory2)
+                if chosen_character is None:
+                    no_selection_error("Not an amiibo bin")
+                else:
+                    # Prints message showing a successful transplant
+                    success_message = "{} bin was saved at {}".format(chosen_character, values[save_location_key])
+                    window[success_text_key].update(success_message, visible=True)
+                    window[success_text_key].set_size((len(success_message), 1))
+                    update_all_listboxes(window, char_dict, directory1, directory2)
         elif event == browsed_key:
             directory1 = values[folder_location_key]
             # changes bin list when new folder is picked
@@ -168,11 +180,14 @@ def main():
             if len(donor_bin) == 0 or len(receiver_bin) == 0:
                 no_selection_error("Please select a donor and a receiver to transplant a serial number.")
             else:
-                transplanter.serial_swapper(donor_bin, receiver_bin, values[swap_save_location_key])
-                success_message = "{} received a new SN and was successfully saved at {}".format(receiver_bin, values[swap_save_location_key])
-                window[success_swap_key].update(success_message, visible=True)
-                window[success_swap_key].set_size((len(success_message), 1))
-                update_all_listboxes(window, char_dict, directory1, directory2)
+                success_check = transplanter.serial_swapper(donor_bin, receiver_bin, values[swap_save_location_key])
+                if success_check is None:
+                    no_selection_error("Not an amiibo bin")
+                else:
+                    success_message = "{} received a new SN and was successfully saved at {}".format(receiver_bin, values[swap_save_location_key])
+                    window[success_swap_key].update(success_message, visible=True)
+                    window[success_swap_key].set_size((len(success_message), 1))
+                    update_all_listboxes(window, char_dict, directory1, directory2)
 
         # Character Dictionary Tab
         # Add Character
