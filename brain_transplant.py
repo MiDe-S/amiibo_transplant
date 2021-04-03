@@ -122,9 +122,11 @@ def main():
     # about tab
     about_layout = [[sg.Text("Version Number {}".format(version_number))],
                     [sg.Text("If you encounter issues raise an issue on github or dm MiDe#9934 on discord")],
-                    [sg.Text("Placeholder text for what transplant tab is")],
-                    [sg.Text("Placeholder text for what sn transplant tab is")],
-                    [sg.Text("Placeholder text for what characters.xml editor tab is")],
+                    [sg.Text("The transplant tab changes the character of the bin.")],
+                    [sg.Text("The SN transplant tab copies the SN of the donor on to the receiver.")],
+                    [sg.Text("*In order to put a bin onto a figure, you have to perform a SN transplant so it has the same SN as the figure.")],
+                    [sg.Text("*then put the transplanted bin on a powertag, save it in powersaves, THEN it will appear in the restore tab.")],
+                    [sg.Text("The Characters.xml Editor tab lets you add new amiibo ID's to the Character box.")],
                     [sg.Text("Shoutouts to the amiibo homies at USAC: https://discord.gg/2SEqk9p", tooltip="I'm too lazy to make this an actual link for now")]]
 
     tabs = [[sg.TabGroup([[sg.Tab("Transplant", transplant_layout),
