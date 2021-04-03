@@ -1,4 +1,5 @@
 import xml.etree.ElementTree as xml
+from random import choice
 
 default_assets_location = r"Brain_Transplant_Assets/characters.xml"
 
@@ -23,6 +24,8 @@ class CharacterDictionary:
         :param item: character to index dictionary for
         :return: string of given character's hex_id
         """
+        if item == "Random":
+            return self.dict[choice(self.get_list(False))][0]
         return self.dict[item][0]
 
     def update_characters(self, file_location=default_assets_location):
