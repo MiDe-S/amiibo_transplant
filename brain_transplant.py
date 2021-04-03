@@ -113,11 +113,14 @@ def main():
     # about tab
     about_layout = [[sg.Text("Version Number {}".format(version_number))],
                     [sg.Text("If you encounter issues raise an issue on github or dm MiDe#9934 on discord")],
+                    [sg.Text("Placeholder text for what transplant tab is")],
+                    [sg.Text("Placeholder text for what sn transplant tab is")],
+                    [sg.Text("Placeholder text for what characters.xml editor tab is")],
                     [sg.Text("Shoutouts to the amiibo homies at USAC: https://discord.gg/2SEqk9p", tooltip="I'm too lazy to make this an actual link for now")]]
 
     tabs = [[sg.TabGroup([[sg.Tab("Transplant", transplant_layout),
              sg.Tab("Serial Number Transplant", serial_swapper_layout),
-             sg.Tab("Characters.txt Editor", character_list_editor_layout),
+             sg.Tab("Characters.xml Editor", character_list_editor_layout),
              sg.Tab("About", about_layout)]])]]
 
     window = sg.Window('MiDe\'s Brain Transplant Service'.format(version_number), tabs)
