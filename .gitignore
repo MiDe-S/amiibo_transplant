@@ -1,2 +1,5 @@
 *.bin
 ssbu_amiibo.py
+*.zip
+.idea/
+__pycache__/
