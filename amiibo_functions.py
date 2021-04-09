@@ -134,7 +134,10 @@ class BinManager:
             return None
 
         receiver_dump.unlock()
-        receiver_dump.uid_hex = donor_dump.uid_hex
+        # RO areas from https://wiki.gbatemp.net/wiki/Amiibo give FP metadata needed for transplant
+        receiver_dump.data[0:17] = donor_dump.data[0:17]
+        receiver_dump.data[52:129] = donor_dump.data[52:129]
+        receiver_dump.data[520:533] = donor_dump.data[520:533]
         receiver_dump.lock()
 
         with open(saveAs_location, 'wb') as fp:

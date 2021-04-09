@@ -111,7 +111,7 @@ def main():
                               sg.FolderBrowse("Receiver", key=receiver_browse_key, target=browse2_key, enable_events=True),
                               sg.Text(directory2, key=display_dir2_key, auto_size_text=True)],
               [sg.Listbox(located_bins1, sg.LISTBOX_SELECT_MODE_SINGLE, key=donor_box_key, size=(40, 10)), sg.VerticalSeparator(), sg.Listbox(located_bins2, sg.LISTBOX_SELECT_MODE_SINGLE, key=receiver_box_key, size=(40, 10))],
-              [sg.FileSaveAs("Transplant Serial Number", target=swapper_save_key, key=swap_save_location_key, file_types=(('Bin Files', '*.bin'),), default_extension=".bin")],
+              [sg.FileSaveAs("Transplant Figure Metadata", target=swapper_save_key, key=swap_save_location_key, file_types=(('Bin Files', '*.bin'),), default_extension=".bin")],
               [sg.Text(key=success_swap_key, size=(10, 1), visible=False)]]
 
     # character list tab
@@ -123,14 +123,15 @@ def main():
     about_layout = [[sg.Text("Version Number {}".format(version_number))],
                     [sg.Text("If you encounter issues raise an issue on github or dm MiDe#9934 on discord")],
                     [sg.Text("The transplant tab changes the character of the bin.")],
-                    [sg.Text("The SN transplant tab copies the SN of the donor on to the receiver.")],
+                    [sg.Text("The Figure Metadata transplant tab copies the SN of the donor on to the receiver.")],
                     [sg.Text("*In order to put a bin onto a figure, you have to perform a SN transplant so it has the same SN as the figure.")],
                     [sg.Text("*then put the transplanted bin on a powertag, save it in powersaves, THEN it will appear in the restore tab.")],
+                    [sg.Text("*POWERSAVES will say the restoration failed, but it actually didn't.")],
                     [sg.Text("The Characters.xml Editor tab lets you add new amiibo ID's to the Character box.")],
                     [sg.Text("Shoutouts to the amiibo homies at USAC: https://discord.gg/2SEqk9p", tooltip="I'm too lazy to make this an actual link for now")]]
 
     tabs = [[sg.TabGroup([[sg.Tab("Transplant", transplant_layout),
-             sg.Tab("Serial Number Transplant", serial_swapper_layout),
+             sg.Tab("Figure Metadata Transplant", serial_swapper_layout),
              sg.Tab("Characters.xml Editor", character_list_editor_layout),
              sg.Tab("About", about_layout)]])]]
 
@@ -148,15 +149,17 @@ def main():
                 no_selection_error("Please a bin and a character to transplant.")
             # If only 1 character and 1 bin were chosen do the single transplant
             elif len(selected_characters) == 1 and len(bins_to_transplant) == 1:
-                chosen_character = transplanter.transplant(r"\\".join([directory1, name_formatter[bins_to_transplant[0]]]), selected_characters[0], values[save_location_key], values[randomize_sn_key])
-                if chosen_character is None:
-                    no_selection_error("Not an amiibo bin")
-                else:
-                    # Prints message showing a successful transplant
-                    success_message = "{} bin was saved at {}".format(chosen_character, values[save_location_key])
-                    window[success_text_key].update(success_message, visible=True)
-                    window[success_text_key].set_size((len(success_message), 1))
-                    update_all_listboxes(window, char_dict, directory1, directory2)
+                # If save as menu is closed or cancelled do nothing
+                if values[save_location_key] != '':
+                    chosen_character = transplanter.transplant(r"\\".join([directory1, name_formatter[bins_to_transplant[0]]]), selected_characters[0], values[save_location_key], values[randomize_sn_key])
+                    if chosen_character is None:
+                        no_selection_error("Not an amiibo bin")
+                    else:
+                        # Prints message showing a successful transplant
+                        success_message = "{} bin was saved at {}".format(chosen_character, values[save_location_key])
+                        window[success_text_key].update(success_message, visible=True)
+                        window[success_text_key].set_size((len(success_message), 1))
+                        update_all_listboxes(window, char_dict, directory1, directory2)
         elif event == browsed_key:
             directory1 = values[folder_location_key]
             # changes bin list when new folder is picked
@@ -177,19 +180,21 @@ def main():
             window[display_dir2_key].update(directory2)
             window.refresh()
         elif event == swapper_save_key:
-            donor_bin = r"\\".join([directory1, name_formatter[values[donor_box_key][0]]])
-            receiver_bin = r"\\".join([directory2, name_formatter[values[receiver_box_key][0]]])
-            if len(donor_bin) == 0 or len(receiver_bin) == 0:
-                no_selection_error("Please select a donor and a receiver to transplant a serial number.")
-            else:
-                success_check = transplanter.serial_swapper(donor_bin, receiver_bin, values[swap_save_location_key])
-                if success_check is None:
-                    no_selection_error("Not an amiibo bin")
+            # If save as menu is closed or cancelled do nothing
+            if values[swap_save_location_key] != '':
+                donor_bin = r"\\".join([directory1, name_formatter[values[donor_box_key][0]]])
+                receiver_bin = r"\\".join([directory2, name_formatter[values[receiver_box_key][0]]])
+                if len(donor_bin) == 0 or len(receiver_bin) == 0:
+                    no_selection_error("Please select a donor and a receiver to transplant a serial number.")
                 else:
-                    success_message = "{} received a new SN and was successfully saved at {}".format(receiver_bin, values[swap_save_location_key])
-                    window[success_swap_key].update(success_message, visible=True)
-                    window[success_swap_key].set_size((len(success_message), 1))
-                    update_all_listboxes(window, char_dict, directory1, directory2)
+                    success_check = transplanter.serial_swapper(donor_bin, receiver_bin, values[swap_save_location_key])
+                    if success_check is None:
+                        no_selection_error("Not an amiibo bin")
+                    else:
+                        success_message = "{} received a new SN and was successfully saved at {}".format(receiver_bin, values[swap_save_location_key])
+                        window[success_swap_key].update(success_message, visible=True)
+                        window[success_swap_key].set_size((len(success_message), 1))
+                        update_all_listboxes(window, char_dict, directory1, directory2)
 
         # Character Dictionary Tab
         # Add Character
