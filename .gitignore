@@ -3,3 +3,5 @@ ssbu_amiibo.py
 *.zip
 .idea/
 __pycache__/
+build/
+*.spec
