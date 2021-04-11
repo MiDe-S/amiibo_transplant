@@ -116,7 +116,7 @@ def main():
 
     # character list tab
     dict_contents = char_dict.print_contents()
-    character_list_editor_layout = [[sg.Listbox(dict_contents, sg.LISTBOX_SELECT_MODE_SINGLE, size=(50, 15), key=character_edit_box_key, pad=(5, 5))],
+    character_list_editor_layout = [[sg.Listbox(dict_contents, sg.LISTBOX_SELECT_MODE_SINGLE, size=(50, 13), key=character_edit_box_key, pad=(5, 5))],
          [sg.Button("Add", key=add_character_key), sg.Button("Enable/Disable", key=change_enable_key), sg.Button("Delete", key=delete_character_key)]]
 
     # about tab
@@ -131,11 +131,11 @@ def main():
                     [sg.Text("Shoutouts to the amiibo homies at USAC: https://discord.gg/2SEqk9p", tooltip="I'm too lazy to make this an actual link for now")]]
 
     tabs = [[sg.TabGroup([[sg.Tab("Transplant", transplant_layout),
-             sg.Tab("Figure Metadata Transplant", serial_swapper_layout),
-             sg.Tab("Characters.xml Editor", character_list_editor_layout),
+             sg.Tab("Figure Metadata Transplant", serial_swapper_layout, element_justification='center'),
+             sg.Tab("Characters.xml Editor", character_list_editor_layout, element_justification='center'),
              sg.Tab("About", about_layout)]])]]
 
-    window = sg.Window('MiDe\'s Brain Transplant Service'.format(version_number), tabs)
+    window = sg.Window('MiDe\'s Brain Transplant Service'.format(version_number), tabs, element_justification='center')
 
     while True:
         event, values = window.read()
@@ -162,23 +162,26 @@ def main():
                         update_all_listboxes(window, char_dict, directory1, directory2)
         elif event == browsed_key:
             directory1 = values[folder_location_key]
-            # changes bin list when new folder is picked
-            update_all_listboxes(window, char_dict, directory1, directory2)
-            window[pwd_key].update(directory1)
-            window.refresh()
+            if len(directory1) != 0:
+                # changes bin list when new folder is picked
+                update_all_listboxes(window, char_dict, directory1, directory2)
+                window[pwd_key].update(directory1)
+                window.refresh()
         # Serial Swap Tab
         elif event == browse1_key:
             directory1 = values[donor_browse_key]
-            # changes bin list when new folder is picked
-            update_all_listboxes(window, char_dict, directory1, directory2)
-            window[display_dir1_key].update(directory1)
-            window.refresh()
+            if len(directory1) != 0:
+                # changes bin list when new folder is picked
+                update_all_listboxes(window, char_dict, directory1, directory2)
+                window[display_dir1_key].update(directory1)
+                window.refresh()
         elif event == browse2_key:
             directory2 = values[receiver_browse_key]
-            # changes bin list when new folder is picked
-            update_all_listboxes(window, char_dict, directory1, directory2)
-            window[display_dir2_key].update(directory2)
-            window.refresh()
+            if len(directory2) != 0:
+                # changes bin list when new folder is picked
+                update_all_listboxes(window, char_dict, directory1, directory2)
+                window[display_dir2_key].update(directory2)
+                window.refresh()
         elif event == swapper_save_key:
             # If save as menu is closed or cancelled do nothing
             if values[swap_save_location_key] != '':
