@@ -108,8 +108,7 @@ class BinManager:
             dump.unlock()
         except:
             input('''
-            Opening {} has failed, this is probably because the bin isn't exactly 540 bytes in size
-            To fix your bin, please check out the README
+            Opening {} has failed.
             Hit any button to close the program.'''.format(bin))
             exit()
         dump.data[84:92] = bytes.fromhex(hex_tag)

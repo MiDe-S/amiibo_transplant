@@ -35,6 +35,7 @@ change_enable_key = '_enable-status_'
 # I know global variables are bad but I'm doing this until I work this into a class
 name_formatter = {}
 
+
 def no_selection_error(error_phrase):
     sg.popup("ERROR:", error_phrase)
 
@@ -112,7 +113,8 @@ def main():
                               sg.Text(directory2, key=display_dir2_key, auto_size_text=True)],
               [sg.Listbox(located_bins1, sg.LISTBOX_SELECT_MODE_SINGLE, key=donor_box_key, size=(40, 10)), sg.VerticalSeparator(), sg.Listbox(located_bins2, sg.LISTBOX_SELECT_MODE_SINGLE, key=receiver_box_key, size=(40, 10))],
               [sg.FileSaveAs("Transplant Figure Metadata", target=swapper_save_key, key=swap_save_location_key, file_types=(('Bin Files', '*.bin'),), default_extension=".bin")],
-              [sg.Text(key=success_swap_key, size=(10, 1), visible=False)]]
+              [sg.Text(key=success_swap_key, size=(10, 1), visible=False)],
+              [sg.Text("Donor is a bin from the figure itself, Receiver is the bin that has the training data you want to put on the figure.")],]
 
     # character list tab
     dict_contents = char_dict.print_contents()
@@ -124,7 +126,7 @@ def main():
                     [sg.Text("If you encounter issues raise an issue on github or dm MiDe#9934 on discord")],
                     [sg.Text("The transplant tab changes the character of the bin.")],
                     [sg.Text("The Figure Metadata transplant tab copies the SN of the donor on to the receiver.")],
-                    [sg.Text("*In order to put a bin onto a figure, you have to perform a SN transplant so it has the same SN as the figure.")],
+                    [sg.Text("*In order to put a bin onto a figure, you have to perform the metadata transplant.")],
                     [sg.Text("*then put the transplanted bin on a powertag, save it in powersaves, THEN it will appear in the restore tab.")],
                     [sg.Text("*POWERSAVES will say the restoration failed, but it actually didn't.")],
                     [sg.Text("The Characters.xml Editor tab lets you add new amiibo ID's to the Character box.")],
