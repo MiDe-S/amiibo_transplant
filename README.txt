@@ -22,3 +22,6 @@ A: Add it yourself by opening the amiibo in a hex editor (i like https://hexed.i
 ------------------------------------------------------------------------------
 Q: Why do mii fighters not work?
 A: Mii fighters hold special data for the mii of the character. If a mii fighter bin is scanned into ultimate without any data for a mii it crashes the game.
+
+compile into exe with: 
+pyinstaller -wF -i logo.ico brain_transplant.py
