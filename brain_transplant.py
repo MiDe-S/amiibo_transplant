@@ -2,6 +2,7 @@ import PySimpleGUI as sg
 from amiibo_functions import *
 from character_dictionary import CharacterDictionary
 import os
+import requests
 
 # Menu key variables for GUI
 # Transplant Tab
@@ -72,14 +73,20 @@ def update_all_listboxes(window, char_dict, directory1, directory2):
 
 def main():
     # Initialize variables that get used throughout the program
-    version_number = "2.0.0"
+    version_number = "2.1.0"
 
-    if not os.path.exists("Brain_Transplant_Assets/unfixed-info.bin") or not os.path.exists("Brain_Transplant_Assets/locked-secret.bin"):
-        no_selection_error("You are missing the encryption/decryption keys for amiibo.\nThey are named unfixed-info.bin and locked-secret.bin.\nPlease place them in the Brain_Transplant_Assets Folder.")
-        exit()
+    if not ((os.path.exists("Brain_Transplant_Assets/unfixed-info.bin") and os.path.exists("Brain_Transplant_Assets/locked-secret.bin")) or os.path.exists("Brain_Transplant_Assets/key_retail.bin")):
+        no_selection_error("You are missing the encryption/decryption keys for amiibo.\nPlease place them in the Brain_Transplant_Assets Folder.")
+        os._exit(0)
     if not os.path.exists("Brain_Transplant_Assets/characters.xml"):
-        no_selection_error("Something is wrong with characters.xml.\nTry deleting and reinstalling the program or just grab character.xml from the github repository.")
-        exit()
+        try:
+            xml = requests.get("https://raw.githubusercontent.com/MiDe-S/amiibo_transplant/master/Brain_Transplant_Assets/characters.xml")
+            with open("Brain_Transplant_Assets/characters.xml", "w+") as xml_file:
+                xml_file.write(xml.text)
+                xml_file.close()
+        except Exception:
+            no_selection_error("Something is wrong with characters.xml.\nTry deleting and reinstalling the program or just grab character.xml from the github repository.")
+            os._exit(0)
 
     sg.theme("Dark Blue 12")
 
