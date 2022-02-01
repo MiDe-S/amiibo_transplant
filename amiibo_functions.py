@@ -1,6 +1,6 @@
-from amiibo import AmiiboDump, AmiiboMasterKey
+from amiibo import AmiiboMasterKey
+from ssbu_amiibo import SsbuAmiiboDump as AmiiboDump
 import random
-
 
 class BinManager:
     def __init__(self, char_dict, key_directory="Brain_Transplant_Assets"):
@@ -10,11 +10,15 @@ class BinManager:
         """
         self.characters = char_dict
         self.key_directory = key_directory
-        with open(r'\\'.join([self.key_directory, 'unfixed-info.bin']), 'rb') as fp_d, \
-                open(r'\\'.join([self.key_directory, 'locked-secret.bin']), 'rb') as fp_t:
-            self.master_keys = AmiiboMasterKey.from_separate_bin(
-                fp_d.read(), fp_t.read())
-
+        try:
+            with open(r'\\'.join([self.key_directory, 'key_retail.bin']), 'rb') as fp_j:
+                self.master_keys = AmiiboMasterKey.from_combined_bin(
+                    fp_j.read())
+        except FileNotFoundError:
+            with open(r'/'.join([self.key_directory, 'unfixed-info.bin']), 'rb') as fp_d, \
+                open(r'/'.join([self.key_directory, 'locked-secret.bin']), 'rb') as fp_t:
+                    self.master_keys = AmiiboMasterKey.from_separate_bin(
+                        fp_d.read(), fp_t.read())
     def __open_bin(self, bin_location):
         """
         Opens a bin and makes it 540 bytes if it wasn't
@@ -57,13 +61,14 @@ class BinManager:
         """
         self.characters = new_char_dict
 
-    def randomize_sn(self, dump):
+    def randomize_sn(self, dump=None, bin_location=None):
         """
         Randomizes the serial number of a given bin dump
-
         :param dump: Pyamiibo dump of a bin
         :return: None
         """
+        if bin_location is not None:
+            dump = self.__open_bin(bin_location)
         serial_number = "04"
         while len(serial_number) < 20:
             temp_sn = hex(random.randint(0, 255))
@@ -80,6 +85,9 @@ class BinManager:
             dump.unlock()
             dump.uid_hex = serial_number
             dump.lock()
+        if bin_location is not None:
+            with open(bin_location, 'wb') as fp:
+                fp.write(dump.data)
 
     def transplant(self, bin_location, character, saveAs_location, randomize_SN=False):
         """
@@ -93,7 +101,9 @@ class BinManager:
         """
 
         dump = self.__open_bin(bin_location)
-
+        mii_ids = [bytes.fromhex('07c0000000210002'), bytes.fromhex('07c0010000220002'), bytes.fromhex('07c0020000230002')]
+        mii_characters = ['Mii Brawler', 'Mii Swordfighter', 'Mii Gunner']
+        mii_transplant = 'B3E038270F1D4C92ABCEF5427D67F9DCEC30CE3000000000000000000000000000000000000000000040400000000000001F02000208040304020C1302040306020C010409171304030D080000040A0008040A0004021400'
         if dump is None:
             return None
 
@@ -111,6 +121,12 @@ class BinManager:
             Opening {} has failed.
             Hit any button to close the program.'''.format(bin))
             exit()
+        if (character in mii_characters) and (dump.data[84:92] not in mii_ids):
+            dump.data[0x148:0x1A0] = bytes.fromhex(mii_transplant)
+        if (character not in mii_characters) and (dump.data[84:92] in mii_ids):
+            dump.data[0x148:0x1A0] = bytes.fromhex('0' * 176)
+            dump.data[0x143:0x147] = bytes.fromhex('0' * 8)
+            dump.data[503] = 0
         dump.data[84:92] = bytes.fromhex(hex_tag)
         dump.lock()
         with open(saveAs_location, 'wb') as fp:
