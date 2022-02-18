@@ -65,19 +65,21 @@ def found_bins(directory):
     return found_bins
 
 
-def update_all_listboxes(window, char_dict, directory1, directory2, directory3):
-    updated_dir1 = found_bins(directory1)
-    updated_dir2 = found_bins(directory2)
-    updated_dir3 = found_bins(directory3)
-    window[bin_name_key].update(updated_dir1)
+def update_all_listboxes(window, char_dict, directory1, directory2):
+    if directory1 != "":
+        updated_dir1 = found_bins(directory1)
+
+        window[bin_name_key].update(updated_dir1)
+        window[donor_box_key].update(updated_dir1)
+        window[shuffle_name_key].update(updated_dir1)
+
+    if directory2 != "":
+        updated_dir2 = found_bins(directory2)
+        window[receiver_box_key].update(updated_dir2)
+
     window[character_key].update(char_dict.get_list(insert_random=True))
 
     window[character_edit_box_key].update(char_dict.print_contents())
-
-    window[donor_box_key].update(updated_dir1)
-    window[receiver_box_key].update(updated_dir2)
-
-    window[shuffle_name_key].update(updated_dir3)
 
     # refresh window to show updates
     window.refresh()
@@ -136,9 +138,7 @@ def main():
               [sg.Text("Donor is a bin from the figure itself, Receiver is the bin that has the training data you want to put on the figure.")],]
 
     # serial shuffle tab
-    directory3 = directory1
-    locatedbins3 = found_bins(directory3)
-    serial_shuffle_layout = [[sg.Input(key=browse3_key, enable_events=True, visible=False), sg.Input(key=shuffle_save_key, enable_events=True, visible=False), sg.FolderBrowse(target=browse3_key, key=folder_location2_key, enable_events=True), sg.Text("Currently looking at:"), sg.Text(directory3, key=pwd2_key, auto_size_text=True)], [sg.Listbox(locatedbins3, sg.LISTBOX_SELECT_MODE_SINGLE, size=(70, 11), key=shuffle_name_key)], [sg.Text(key=success_shuffle_key, size=(10, 1), visible=False)], [sg.FileSaveAs(target=shuffle_save_key, key = shuffle_save_location_key)]]
+    serial_shuffle_layout = [[sg.Input(key=browse3_key, enable_events=True, visible=False), sg.Input(key=shuffle_save_key, enable_events=True, visible=False), sg.FolderBrowse(target=browse3_key, key=folder_location2_key, enable_events=True), sg.Text("Currently looking at:"), sg.Text(directory1, key=pwd2_key, auto_size_text=True)], [sg.Listbox(located_bins1, sg.LISTBOX_SELECT_MODE_SINGLE, size=(70, 11), key=shuffle_name_key)], [sg.Text(key=success_shuffle_key, size=(10, 1), visible=False)], [sg.FileSaveAs(target=shuffle_save_key, key = shuffle_save_location_key)]]
 
     # character list tab
     dict_contents = char_dict.print_contents()
@@ -186,12 +186,12 @@ def main():
                         success_message = "{} bin was saved at {}".format(chosen_character, values[save_location_key])
                         window[success_text_key].update(success_message, visible=True)
                         window[success_text_key].set_size((len(success_message), 1))
-                        update_all_listboxes(window, char_dict, directory1, directory2, directory3)
+                        update_all_listboxes(window, char_dict, directory1, directory2)
         elif event == browsed_key:
             directory1 = values[folder_location_key]
             if len(directory1) != 0:
                 # changes bin list when new folder is picked
-                update_all_listboxes(window, char_dict, directory1, directory2, directory3)
+                update_all_listboxes(window, char_dict, directory1, directory2)
                 window[pwd_key].update(directory1)
                 window.refresh()
         # Serial Swap Tab
@@ -199,28 +199,28 @@ def main():
             directory1 = values[donor_browse_key]
             if len(directory1) != 0:
                 # changes bin list when new folder is picked
-                update_all_listboxes(window, char_dict, directory1, directory2, directory3)
+                update_all_listboxes(window, char_dict, directory1, directory2)
                 window[display_dir1_key].update(directory1)
                 window.refresh()
         elif event == browse2_key:
             directory2 = values[receiver_browse_key]
             if len(directory2) != 0:
                 # changes bin list when new folder is picked
-                update_all_listboxes(window, char_dict, directory1, directory2, directory3)
+                update_all_listboxes(window, char_dict, directory1, directory2)
                 window[display_dir2_key].update(directory2)
                 window.refresh()
 
         elif event == browse3_key:
-            directory3 = values[folder_location2_key]
-            if len(directory3) != 0:
+            directory1 = values[folder_location2_key]
+            if len(directory1) != 0:
                 # changes bin list when new folder is picked
-                update_all_listboxes(window, char_dict, directory1, directory2, directory3)
-                window[pwd2_key].update(directory3)
+                update_all_listboxes(window, char_dict, directory1, directory2)
+                window[pwd2_key].update(directory1)
                 window.refresh()
 
         elif event == shuffle_save_key:
             if values[shuffle_save_location_key] != '':
-                to_shuffle = r"\\".join([directory3, name_formatter[values[shuffle_name_key][0]]])
+                to_shuffle = r"\\".join([directory1, name_formatter[values[shuffle_name_key][0]]])
                 name = values[shuffle_name_key][0]
                 if len(to_shuffle) == 0:
                     no_selection_error("Please select bin to shuffle the serial number.") 
@@ -229,7 +229,8 @@ def main():
                     success_message = "{} received a new SN and was successfully saved at {}".format(name, values[shuffle_save_location_key])
                     window[success_shuffle_key].update(success_message, visible=True)
                     window[success_shuffle_key].set_size((len(success_message), 1))
-                    update_all_listboxes(window, char_dict, directory1, directory2, directory3)
+                    update_all_listboxes(window, char_dict, directory1, directory2)
+
         elif event == swapper_save_key:
             # If save as menu is closed or cancelled do nothing
             if values[swap_save_location_key] != '':
@@ -245,7 +246,7 @@ def main():
                         success_message = "{} received a new SN and was successfully saved at {}".format(receiver_bin, values[swap_save_location_key])
                         window[success_swap_key].update(success_message, visible=True)
                         window[success_swap_key].set_size((len(success_message), 1))
-                        update_all_listboxes(window, char_dict, directory1, directory2, directory3)
+                        update_all_listboxes(window, char_dict, directory1, directory2)
 
         # Character Dictionary Tab
         # Add Character
@@ -270,7 +271,7 @@ def main():
                     if len(values[add_ID_key]) == 16:
                         char_dict.add_character(values[add_name_key], values[add_ID_key], values[add_enable_key])
                         char_dict.save_XML()
-                        update_all_listboxes(window, char_dict, directory1, directory2, directory3)
+                        update_all_listboxes(window, char_dict, directory1, directory2)
                         break
                     else:
                         sg.Popup("Invalid Length!", "Amiibo character IDs are always 16 characters long", "Try Again!")
