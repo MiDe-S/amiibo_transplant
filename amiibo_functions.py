@@ -61,7 +61,7 @@ class BinManager:
         """
         self.characters = new_char_dict
 
-    def randomize_sn(self, dump=None, bin_location=None):
+    def randomize_sn(self, dump=None, bin_location=None, save_to_location= None):
         """
         Randomizes the serial number of a given bin dump
         :param dump: Pyamiibo dump of a bin
@@ -86,7 +86,7 @@ class BinManager:
             dump.uid_hex = serial_number
             dump.lock()
         if bin_location is not None:
-            with open(bin_location, 'wb') as fp:
+            with open(save_to_location, 'wb') as fp:
                 fp.write(dump.data)
 
     def transplant(self, bin_location, character, saveAs_location, randomize_SN=False):
