@@ -5,3 +5,4 @@ ssbu_amiibo.py
 __pycache__/
 build/
 *.spec
+dist/
