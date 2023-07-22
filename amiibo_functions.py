@@ -71,7 +71,10 @@ class BinManager:
             dump = self.__open_bin(bin_location)
         serial_number = "04"
         while len(serial_number) < 20:
-            temp_sn = hex(random.randint(0, 255))
+            rn = random.randint(0, 255)
+            if rn == 136:
+                rn += 1
+            temp_sn = hex(rn)
             # removes 0x prefix
             temp_sn = temp_sn[2:]
             # creates leading zero
