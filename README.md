@@ -1,4 +1,12 @@
 <h1>
+NOTICE:
+</h1>
+
+<p>
+    All features of brain transplant service are now present in <a href="https://github.com/jozz024/smash-amiibo-editor">SAE.</a> Please use SAE instead, this project is now considered deprecated.
+</p>
+
+<h1>
   MiDe's Brain Transplanting Service
 </h1>
 
