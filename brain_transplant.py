@@ -1,4 +1,4 @@
-import PySimpleGUI as sg
+import FreeSimpleGUI as sg
 from amiibo_functions import *
 from character_dictionary import CharacterDictionary
 import os
